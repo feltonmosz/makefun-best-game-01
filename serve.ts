@@ -26,8 +26,14 @@ const MIME = {
 
 const server = createServer((req, res) => {
   const url = new URL(req.url ?? '/', 'http://localhost');
-  let pathname = decodeURIComponent(url.pathname);
-  if (pathname === '/') pathname = '/game/index.html';
+  const pathname = decodeURIComponent(url.pathname);
+  // The root redirects to the game page: serving index.html at / would break
+  // its relative ./src/ imports (they would resolve to /src/ instead).
+  if (pathname === '/') {
+    res.writeHead(302, { location: '/game/index.html' });
+    res.end();
+    return;
+  }
   const file = normalize(join(root, pathname));
   // Never serve outside the repository, whatever the path asks for.
   if (!file.startsWith(root) || !existsSync(file) || !statSync(file).isFile()) {

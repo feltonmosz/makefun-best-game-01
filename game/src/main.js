@@ -56,7 +56,8 @@ function saveBest(value) {
 
 function runShot(name) {
   const scene = stageShot(name, world);
-  const best = Math.max(readBest(), world.state.score);
+  // The title scene's attract score is not a best score: show only a saved one.
+  const best = scene.screen === SCREEN_TITLE ? readBest() : Math.max(readBest(), world.state.score);
   let painted = 0;
   function paint() {
     renderer.draw(world.state, scene.screen, best, {
